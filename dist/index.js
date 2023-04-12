@@ -57985,7 +57985,7 @@ async function run() {
     //await exec.exec("actions/checkout@v2", ['--branch', branch, '--repository', 'opencv/opencv', '--path', 'opencv']);
     await exec.exec("git", ['clone', '--branch', branch, '--single-branch', '--depth', '1', 'https://github.com/opencv/opencv.git', 'opencv']);
     //await exec.exec("git", ['clone', '--branch', branch, '--single-branch', '--depth', '1', 'https://github.com/opencv/opencv_contrib.git', 'opencv_contrib']);
-    //await io.mkdirP('build');
+    await io.mkdirP('build');
     process.chdir('build');
     // see doc: https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
     //await exec.exec("cmake", [
