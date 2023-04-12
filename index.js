@@ -24,9 +24,9 @@ async function run() {
       core.setOutput("Cache service is not availible");
     } else {
       console.log("Get Cache:");
-      console.log(`cahce key: opencv-${platform}-${branch}`);
+      console.log(`cache key: ${storeKey}`);
       cacheKey = await cache.restoreCache(cachePaths, storeKey);
-      console.log(`cacheKey:${cacheKey}`);
+      console.log(`restoreCache return ${cacheKey}`);
     }
 
     if (cacheKey) {
@@ -51,7 +51,7 @@ async function run() {
     await exec.exec("cmake", [ '--build', '.']);
     process.chdir('..');
     await exec.exec("ls -l");
-    const ret = await cache.saveCache(cachePaths, storeKey);
+    const ret = await cache.saveCache(cachePaths, storeKey); // Cache Size: ~363 MB (380934981 B)
     // await wait(parseInt(ms));
     console.log('saveCache return ', ret);
     // core.setOutput('time', new Date().toTimeString());
