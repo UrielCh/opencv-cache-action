@@ -57955,6 +57955,7 @@ async function run() {
     let cacheKey = undefined;
     const branch = core.getInput('branch');
     console.log("branch:", branch);
+    console.error("branch as errror:", branch);
 
     if (!cache.isFeatureAvailable) {
       console.log("NO CACHE");
@@ -57986,6 +57987,7 @@ async function run() {
     console.log((new Date()).toTimeString());
     core.setOutput('time', new Date().toTimeString());
   } catch (error) {
+    console.error(error.message);
     core.setFailed(error.message);
   }
 }
