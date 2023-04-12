@@ -57999,7 +57999,7 @@ async function run() {
       '-DCMAKE_BUILD_TYPE=Release',
       '-DOPENCV_ENABLE_NONFREE=ON',
       '-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules',
-      '-DBUILD_LIST=core,imgcodecs,calib3d,python3,python_bindings_generator',
+      '-DBUILD_LIST=core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator',
       '../opencv',
     ]);
     await exec.exec("cmake", [ '--build', '.']);
