@@ -17,7 +17,7 @@ async function run() {
       console.log("Get Cache:");
       const platform = process.env.RUNNER_OS;
       console.log(`cahce key: opencv-${platform}-${branch}`);
-      cacheKey = cache.restoreCache(["opencv"], `opencv-${platform}-${branch}`);
+      cacheKey = await cache.restoreCache(["opencv"], `opencv-${platform}-${branch}`);
       console.log(`cacheKey:${cacheKey}`);
     }
     if (cacheKey) {
