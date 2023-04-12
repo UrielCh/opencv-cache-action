@@ -28,8 +28,11 @@ async function run() {
     core.info(`Calling actions/checkout ...`);
     console.log("clonning");
 
-    await exec.exec("actions/checkout@v2", ['--branch', branch, '--repository', 'opencv/opencv', '--path', 'opencv']);
+    //await exec.exec("actions/checkout@v2", ['--branch', branch, '--repository', 'opencv/opencv', '--path', 'opencv']);
+    await exec.exec("git", ['clone', '--branch', branch, 'https://github.com/opencv/opencv.git', 'opencv']);
     console.log("clonning Done");
+
+    await exec.exec("git", ['clone', '--branch', branch, 'https://github.com/opencv/opencv_contrib.git', 'opencv_contrib']);
 
     core.setOutput('getExecOutput("ls -l")');
     const out = await exec.getExecOutput("ls -l");
