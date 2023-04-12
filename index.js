@@ -9,10 +9,12 @@ const process = require('process');
 // most @actions toolkit packages have async methods
 async function run() {
   try {
+    await exec.exec("pwd");
+    // get one LVL up
+    process.chdir('..');
+
     let cacheKey = undefined;
     const branch = core.getInput('branch');
-    console.log("branch:", branch);
-
     if (!cache.isFeatureAvailable) {
       console.log("NO CACHE");
       core.setOutput("Cache service is not availible");
@@ -28,6 +30,7 @@ async function run() {
       core.setOutput("Cache Restored");
       return;
     }
+
     //await exec.exec("actions/checkout@v2", ['--branch', branch, '--repository', 'opencv/opencv', '--path', 'opencv']);
     await exec.exec("git", ['clone', '--branch', branch, '--single-branch', '--depth', '1', 'https://github.com/opencv/opencv.git', 'opencv']);
     //await exec.exec("git", ['clone', '--branch', branch, '--single-branch', '--depth', '1', 'https://github.com/opencv/opencv_contrib.git', 'opencv_contrib']);
