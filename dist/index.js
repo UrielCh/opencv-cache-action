@@ -57987,16 +57987,23 @@ async function run() {
       cacheKey = await cache.restoreCache(cachePaths, storeKey, undefined,{lookupOnly: true});
       console.log(`Lookup return: ${storeKey}`);
 
-      console.log(`Get Cache key: ${storeKey}`);
-      cacheKey = await cache.restoreCache(cachePaths, storeKey);
-      console.log(`restoreCache return ${cacheKey}`);
-    }
-
-    if (cacheKey) {
-      // done for now.
-      core.setOutput("Cache Restored");
-      console.timeEnd('cache');
-      return;
+      if (cacheKey) {
+        for (let i = 0; i < 10; i++) {
+          console.log(`Get Cache key: ${storeKey} pass ${i+1}/10`);
+          cacheKey = await cache.restoreCache(cachePaths, storeKey, undefined, {downloadConcurrency: 4, timeoutInMs: 120000});
+          if (cacheKey) {
+            console.log(`restoreCache Success`);
+            // core.setOutput("Cache Restored");
+            console.timeEnd('cache');
+            return;
+          }
+        }
+        core.error(`restoreCache key: ${storeKey} Failed.`)
+        core.setFailed(`restoreCache key: ${storeKey} Failed.`);
+        process.exit(1);
+      } else {
+        console.log(`No cached value found for input keys: ${storeKey}, Building from sources`);
+      }
     }
 
     await exec.exec("git", ['clone', '--quiet', '--branch', branch, '--single-branch', '--depth', '1', 'https://github.com/opencv/opencv.git', 'opencv']);
