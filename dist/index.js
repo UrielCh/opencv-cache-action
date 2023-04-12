@@ -57955,14 +57955,16 @@ async function run() {
     let cacheKey = undefined;
     const branch = core.getInput('branch');
     console.log("branch:", branch);
-    console.error("branch as errror:", branch);
 
     if (!cache.isFeatureAvailable) {
       console.log("NO CACHE");
       core.setOutput("Cache service is not availible");
     } else {
+      console.log("Get Cache:");
       const platform = process.env.RUNNER_OS;
+      console.log(`cahce key: opencv-${platform}-${branch}`);
       cacheKey = cache.restoreCache(["opencv"], `opencv-${platform}-${branch}`);
+      console.log(`cacheKey:${cacheKey}`);
     }
     if (cacheKey) {
       // done for now.
