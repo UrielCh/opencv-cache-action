@@ -57969,23 +57969,29 @@ async function run() {
 
     let cacheKey = undefined;
     const branch = core.getInput('branch');
+    const platform = process.env.RUNNER_OS;
+    const storeKey = `opencv-${platform}-${branch}-test`;
+
+    console.time('cache');
+
+
     if (!cache.isFeatureAvailable) {
       console.log("NO CACHE");
       core.setOutput("Cache service is not availible");
     } else {
       console.log("Get Cache:");
-      const platform = process.env.RUNNER_OS;
       console.log(`cahce key: opencv-${platform}-${branch}`);
-      cacheKey = await cache.restoreCache(["opencv"], `opencv-${platform}-${branch}`);
+      cacheKey = await cache.restoreCache(["opencv"], storeKey);
       console.log(`cacheKey:${cacheKey}`);
     }
+
     if (cacheKey) {
       // done for now.
       core.setOutput("Cache Restored");
+      console.timeEnd('cache');
       return;
     }
 
-    //await exec.exec("actions/checkout@v2", ['--branch', branch, '--repository', 'opencv/opencv', '--path', 'opencv']);
     await exec.exec("git", ['clone', '--branch', branch, '--single-branch', '--depth', '1', 'https://github.com/opencv/opencv.git', 'opencv']);
     //await exec.exec("git", ['clone', '--branch', branch, '--single-branch', '--depth', '1', 'https://github.com/opencv/opencv_contrib.git', 'opencv_contrib']);
     await io.mkdirP('build');
@@ -58001,10 +58007,11 @@ async function run() {
     // await exec.exec("cmake", [ '--build', '.']);
     process.chdir('..');
     await exec.exec("ls -l");
-
+    const ret = await cache.saveCache(["opencv"], storeKey);
     // await wait(parseInt(ms));
-    console.log((new Date()).toTimeString());
-    core.setOutput('time', new Date().toTimeString());
+    console.log('saveCache return ', ret);
+    // core.setOutput('time', new Date().toTimeString());
+    console.timeEnd('cache');
   } catch (error) {
     console.error(error.message);
     core.setFailed(error.message);
