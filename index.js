@@ -1,6 +1,9 @@
 const core = require('@actions/core');
 const cache = require('@actions/cache');
 const exec = require('@actions/exec');
+const io = require('@actions/io');
+const process = require('process');
+
 // const wait = require('./wait');
 
 // most @actions toolkit packages have async methods
@@ -29,10 +32,24 @@ async function run() {
     console.log("clonning");
 
     //await exec.exec("actions/checkout@v2", ['--branch', branch, '--repository', 'opencv/opencv', '--path', 'opencv']);
-    await exec.exec("git", ['clone', '--branch', branch, 'https://github.com/opencv/opencv.git', 'opencv']);
+    await exec.exec("git", ['clone', '--branch', branch, '--single-branch', '--depth', '1', 'https://github.com/opencv/opencv.git', 'opencv']);
     console.log("clonning Done");
 
-    await exec.exec("git", ['clone', '--branch', branch, 'https://github.com/opencv/opencv_contrib.git', 'opencv_contrib']);
+    await exec.exec("git", ['clone', '--branch', branch, '--single-branch', '--depth', '1', 'https://github.com/opencv/opencv_contrib.git', 'opencv_contrib']);
+
+
+    await io.mkdirP('build');
+    process.chdir('build');
+    // see doc: https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
+    await exec.exec("cmake", [
+      '-DCMAKE_BUILD_TYPE=Release',
+      '-DOPENCV_ENABLE_NONFREE=ON',
+      '-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules',
+      '-DBUILD_LIST=core,imgcodecs,calib3d,python3,python_bindings_generator',
+      '../opencv',
+    ]);
+
+    await exec.exec("cmake", [ '--build', '.']);
 
     core.setOutput('getExecOutput("ls -l")');
     const out = await exec.getExecOutput("ls -l");
