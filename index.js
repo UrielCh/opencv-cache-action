@@ -50,7 +50,8 @@ async function run() {
     ]);
     await exec.exec("cmake", [ '--build', '.']);
     process.chdir('..');
-    await exec.exec("ls -l");
+    // await exec.exec("ls -l"); // build opencv opencv_contrib
+    console.log('start saveCache to key:', storeKey);
     const ret = await cache.saveCache(cachePaths, storeKey); // Cache Size: ~363 MB (380934981 B)
     // await wait(parseInt(ms));
     console.log('saveCache return ', ret);
