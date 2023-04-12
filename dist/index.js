@@ -57974,11 +57974,13 @@ async function run() {
     const storeKey = `opencv-${platform}-${branch}`;
     console.time('cache');
     if (!cache.isFeatureAvailable) {
-      console.log("NO CACHE");
       core.setOutput("Cache service is not availible");
     } else {
-      console.log("Get Cache:");
-      console.log(`cache key: ${storeKey}`);
+      console.log(`Lookup Cache key: ${storeKey}`);
+      cacheKey = await cache.restoreCache(cachePaths, storeKey, undefined,{lookupOnly: true});
+      console.log(`Lookup return: ${storeKey}`);
+
+      console.log(`Get Cache key: ${storeKey}`);
       cacheKey = await cache.restoreCache(cachePaths, storeKey);
       console.log(`restoreCache return ${cacheKey}`);
     }
