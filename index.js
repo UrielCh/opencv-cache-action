@@ -3,21 +3,28 @@ const cache = require('@actions/cache');
 const exec = require('@actions/exec');
 const io = require('@actions/io');
 const process = require('process');
+const crypto = require('crypto');
 
 // const wait = require('./wait');
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
+    const branch = core.getInput('branch');
+    const BUILD_LIST = core.getInput('BUILD_LIST').split(',').filter(a=>a.trim()).sort().join(',');
+    const hash = crypto.createHash('md5');
+    hash.update(BUILD_LIST);
+    const sig = hash.digest('hex');
+    // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
     const cachePaths = ["opencv", "opencv_contrib", "build"];
     await exec.exec("pwd");
     // get one LVL up
     process.chdir('..');
 
     let cacheKey = undefined;
-    const branch = core.getInput('branch');
+    
     const platform = process.env.RUNNER_OS;
-    const storeKey = `opencv-${platform}-${branch}`;
+    const storeKey = `opencv-${platform}-${branch}-${sig}`;
     console.time('cache');
     if (!cache.isFeatureAvailable) {
       core.setOutput("Cache service is not availible");
@@ -47,7 +54,7 @@ async function run() {
       '-DCMAKE_BUILD_TYPE=Release',
       '-DOPENCV_ENABLE_NONFREE=ON',
       '-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules',
-      '-DBUILD_LIST=core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator',
+      `-DBUILD_LIST=${BUILD_LIST}`,
       '../opencv',
     ]);
     await exec.exec("cmake", [ '--build', '.']);

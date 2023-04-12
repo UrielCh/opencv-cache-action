@@ -5,6 +5,11 @@ inputs:
     description: 'branch to checkout default is 4.x'
     required: true
     default: '4.x'
+  BUILD_LIST:
+    description: 'List of feature to compile, the less features you select the smallest will be the image.'
+    required: true
+    default: 'core'
+
 #outputs:
 #  time: # output will be available to future steps
 #    description: 'The current time after waiting'
