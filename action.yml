@@ -1,13 +1,13 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'opencv-cache'
+description: 'download, build and cache opencv'
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  branch:
+    description: 'branch to checkout default is 4.x'
     required: true
-    default: '1000'
-outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
+    default: '4.x'
+#outputs:
+#  time: # output will be available to future steps
+#    description: 'The current time after waiting'
 runs:
   using: 'node16'
   main: 'dist/index.js'
