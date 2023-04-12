@@ -57983,9 +57983,8 @@ async function run() {
     if (!cache.isFeatureAvailable) {
       core.setOutput("Cache service is not availible");
     } else {
-      console.log(`Lookup Cache key: ${storeKey}`);
       cacheKey = await cache.restoreCache(cachePaths, storeKey, undefined,{lookupOnly: true});
-      console.log(`Lookup return: ${storeKey}`);
+      console.log(`Lookup cache key: "${storeKey}" return ${cacheKey}`);
 
       if (cacheKey) {
         for (let i = 0; i < 10; i++) {
