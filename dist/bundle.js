@@ -74001,7 +74001,6 @@ __webpack_unused_export__ = ({ value: true });
 const fs = __webpack_require__(7147);
 const core = __webpack_require__(2225);
 const cache = __webpack_require__(1188);
-const io = __webpack_require__(484);
 const process = __webpack_require__(7282);
 const Configurations_1 = __webpack_require__(1651);
 const utils_1 = __webpack_require__(8593);
@@ -74016,7 +74015,9 @@ async function getCode(config) {
         // await exec.exec("git", [ "clone", "--branch", branch, "--single-branch", "--depth", "1", "https://github.com/opencv/opencv_contrib.git", "opencv_contrib" ]);
     }
     console.log('Files in the current folder: ', fs.readdirSync('.'));
-    await io.mkdirP("build");
+    console.log('Mk dir build');
+    fs.mkdirSync('build');
+    // await io.mkdirP("build");
     console.log('Files in the current folder: ', fs.readdirSync('.'));
     process.chdir("build");
     process.chdir(`Now in the folder ${process.cwd()}`);

@@ -20,10 +20,13 @@ async function getCode(config: Configurations) {
 
   console.log('Files in the current folder: ', fs.readdirSync('.'))
 
-  await io.mkdirP("build");
+  console.log('Mk dir build')
+  fs.mkdirSync('build');
+  // await io.mkdirP("build");
   console.log('Files in the current folder: ', fs.readdirSync('.'))
-  
+
   process.chdir("build");
+
   process.chdir(`Now in the folder ${process.cwd()}`);
   
   // see doc: https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
