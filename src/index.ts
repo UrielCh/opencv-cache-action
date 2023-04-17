@@ -42,6 +42,8 @@ async function getCode(config: Configurations) {
 // most @actions toolkit packages have async methods
 async function run() {
   try {
+    if (!core)
+      throw new Error("core is undefined");
     const config = new Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"));
     config.normalize();
     // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
