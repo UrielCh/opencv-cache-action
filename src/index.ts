@@ -7,8 +7,6 @@ import { Configurations } from "./Configurations";
 import { downloadFile, unzipFile } from "./utils";
 import * as exec from "@actions/exec";
 
-const cachePaths = ["opencv", "opencv_contrib", "build"];
-
 async function getCode(config: Configurations) {
   await downloadFile(config.openCVUrl, "opencv.zip");
   await unzipFile("opencv.zip", "opencv");
@@ -23,6 +21,8 @@ async function getCode(config: Configurations) {
   console.log('Files in the current folder: ', fs.readdirSync('.'))
 
   await io.mkdirP("build");
+  console.log('Files in the current folder: ', fs.readdirSync('.'))
+  
   process.chdir("build");
   process.chdir(`Now in the folder ${process.cwd()}`);
   
@@ -43,7 +43,7 @@ async function getCode(config: Configurations) {
   process.chdir(`back to folder ${process.cwd()}`);
 
   // console.log("start saveCache to key:", storeKey);
-  const ret = await cache.saveCache(cachePaths, config.storeKey); // Cache Size: ~363 MB (380934981 B)
+  const ret = await cache.saveCache(config.cacheDir, config.storeKey); // Cache Size: ~363 MB (380934981 B)
   console.log("saveCache return ", ret);
   console.timeEnd("cache");
 }
@@ -68,7 +68,7 @@ async function run() {
     console.time("cache");
     const storeKey = config.storeKey;
     console.log(`Get Cache key: ${storeKey}`);
-    const cacheKey = await cache.restoreCache(cachePaths, storeKey, undefined, {
+    const cacheKey = await cache.restoreCache(config.cacheDir, storeKey, undefined, {
       downloadConcurrency: 4,
       timeoutInMs: 120000,
     });

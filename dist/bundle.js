@@ -64684,6 +64684,11 @@ class Configurations {
     get openCVContribUrl() {
         return `https://github.com/opencv/opencv_contrib/archive/${this.branch}.zip`;
     }
+    get cacheDir() {
+        if (this.NO_CONTRIB)
+            return ["opencv", "build"];
+        return ["opencv", "opencv_contrib", "build"];
+    }
 }
 exports.Configurations = Configurations;
 
@@ -74001,7 +74006,6 @@ const process = __webpack_require__(7282);
 const Configurations_1 = __webpack_require__(1651);
 const utils_1 = __webpack_require__(8593);
 const exec = __webpack_require__(27);
-const cachePaths = ["opencv", "opencv_contrib", "build"];
 async function getCode(config) {
     await (0, utils_1.downloadFile)(config.openCVUrl, "opencv.zip");
     await (0, utils_1.unzipFile)("opencv.zip", "opencv");
@@ -74013,6 +74017,7 @@ async function getCode(config) {
     }
     console.log('Files in the current folder: ', fs.readdirSync('.'));
     await io.mkdirP("build");
+    console.log('Files in the current folder: ', fs.readdirSync('.'));
     process.chdir("build");
     process.chdir(`Now in the folder ${process.cwd()}`);
     // see doc: https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
@@ -74030,7 +74035,7 @@ async function getCode(config) {
     process.chdir("..");
     process.chdir(`back to folder ${process.cwd()}`);
     // console.log("start saveCache to key:", storeKey);
-    const ret = await cache.saveCache(cachePaths, config.storeKey); // Cache Size: ~363 MB (380934981 B)
+    const ret = await cache.saveCache(config.cacheDir, config.storeKey); // Cache Size: ~363 MB (380934981 B)
     console.log("saveCache return ", ret);
     console.timeEnd("cache");
 }
@@ -74054,7 +74059,7 @@ async function run() {
         console.time("cache");
         const storeKey = config.storeKey;
         console.log(`Get Cache key: ${storeKey}`);
-        const cacheKey = await cache.restoreCache(cachePaths, storeKey, undefined, {
+        const cacheKey = await cache.restoreCache(config.cacheDir, storeKey, undefined, {
             downloadConcurrency: 4,
             timeoutInMs: 120000,
         });

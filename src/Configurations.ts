@@ -32,6 +32,11 @@ export class Configurations {
         return `https://github.com/opencv/opencv_contrib/archive/${this.branch}.zip`;
     }
 
+    get cacheDir(): string[] {
+        if (this.NO_CONTRIB)
+            return ["opencv", "build"];
+        return ["opencv", "opencv_contrib", "build"];
+    }
 }
   
   
