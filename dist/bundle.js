@@ -73993,6 +73993,7 @@ var exports = __webpack_exports__;
 var __webpack_unused_export__;
 
 __webpack_unused_export__ = ({ value: true });
+const fs = __webpack_require__(7147);
 const core = __webpack_require__(2225);
 const cache = __webpack_require__(1188);
 const io = __webpack_require__(484);
@@ -74010,8 +74011,10 @@ async function getCode(config) {
         await (0, utils_1.unzipFile)("opencv_contrib.zip", "opencv_contrib");
         // await exec.exec("git", [ "clone", "--branch", branch, "--single-branch", "--depth", "1", "https://github.com/opencv/opencv_contrib.git", "opencv_contrib" ]);
     }
+    console.log('Files in the current folder: ', fs.readdirSync('.'));
     await io.mkdirP("build");
     process.chdir("build");
+    process.chdir(`Now in the folder ${process.cwd()}`);
     // see doc: https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
     const cMakeArgs = [
         "-DCMAKE_BUILD_TYPE=Release",
@@ -74025,6 +74028,7 @@ async function getCode(config) {
     await exec.exec("cmake", cMakeArgs);
     await exec.exec("cmake", ["--build", "."]);
     process.chdir("..");
+    process.chdir(`back to folder ${process.cwd()}`);
     // console.log("start saveCache to key:", storeKey);
     const ret = await cache.saveCache(cachePaths, config.storeKey); // Cache Size: ~363 MB (380934981 B)
     console.log("saveCache return ", ret);

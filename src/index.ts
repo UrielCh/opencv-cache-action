@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import * as core from "@actions/core";
 import * as cache from "@actions/cache";
 import * as io from "@actions/io";
@@ -19,8 +20,12 @@ async function getCode(config: Configurations) {
     // await exec.exec("git", [ "clone", "--branch", branch, "--single-branch", "--depth", "1", "https://github.com/opencv/opencv_contrib.git", "opencv_contrib" ]);
   }
 
+  console.log('Files in the current folder: ', fs.readdirSync('.'))
+
   await io.mkdirP("build");
   process.chdir("build");
+  process.chdir(`Now in the folder ${process.cwd()}`);
+  
   // see doc: https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
   const cMakeArgs = [
     "-DCMAKE_BUILD_TYPE=Release",
@@ -34,6 +39,9 @@ async function getCode(config: Configurations) {
   await exec.exec("cmake", cMakeArgs);
   await exec.exec("cmake", ["--build", "."]);
   process.chdir("..");
+
+  process.chdir(`back to folder ${process.cwd()}`);
+
   // console.log("start saveCache to key:", storeKey);
   const ret = await cache.saveCache(cachePaths, config.storeKey); // Cache Size: ~363 MB (380934981 B)
   console.log("saveCache return ", ret);
