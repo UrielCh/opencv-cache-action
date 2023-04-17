@@ -74018,9 +74018,10 @@ async function getCode(config) {
     console.log('Mk dir build');
     fs.mkdirSync('build');
     // await io.mkdirP("build");
-    console.log('Files in the current folder: ', fs.readdirSync('.'));
-    process.chdir("build");
-    process.chdir(`Now in the folder ${process.cwd()}`);
+    console.log(`Files in the current folder (${process.cwd}): `, fs.readdirSync('.'));
+    const workdir = "build";
+    // process.chdir(path.join(process.cwd) "build");
+    //process.chdir(`Now in the folder ${process.cwd()}`);
     // see doc: https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
     const cMakeArgs = [
         "-DCMAKE_BUILD_TYPE=Release",
@@ -74031,9 +74032,9 @@ async function getCode(config) {
         cMakeArgs.push("-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules");
     }
     cMakeArgs.push("../opencv");
-    await exec.exec("cmake", cMakeArgs);
-    await exec.exec("cmake", ["--build", "."]);
-    process.chdir("..");
+    await exec.exec("cmake", cMakeArgs, { cwd: workdir });
+    await exec.exec("cmake", ["--build", "."], { cwd: workdir });
+    // process.chdir("..");
     process.chdir(`back to folder ${process.cwd()}`);
     // console.log("start saveCache to key:", storeKey);
     const ret = await cache.saveCache(config.cacheDir, config.storeKey); // Cache Size: ~363 MB (380934981 B)
