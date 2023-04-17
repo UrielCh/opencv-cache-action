@@ -5,9 +5,7 @@ import * as unzipper from 'unzipper';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 
-const pipelineAsync = promisify(pipeline);
-
-async function unzipFile(input: string, dest: string) {
+export async function unzipFile(input: string, dest: string) {
     return new Promise<undefined>((resolve, reject) => {
       // Create a read stream for the input file
       const readStream = fs.createReadStream(input);
