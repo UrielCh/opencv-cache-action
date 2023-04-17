@@ -24,7 +24,7 @@ async function getCode(config: Configurations) {
   console.log('Mk dir build')
   fs.mkdirSync('build');
   // await io.mkdirP("build");
-  console.log(`Files in the current folder (${process.cwd}): `, fs.readdirSync('.'))
+  console.log(`Files in the current folder (${process.cwd()}): `, fs.readdirSync('.'))
 
   const workdir = "build";
 

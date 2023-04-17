@@ -22,7 +22,7 @@ jobs:
       with:
         branch: "4.6.0"
         BUILD_LIST: "core,imgproc,imgcodecs"
-        NO_CONTRIB: "1"
+        NO_CONTRIB: ""
 
     - name: List files of build
       run: cd ${GITHUB_WORKSPACE}/.. && find build

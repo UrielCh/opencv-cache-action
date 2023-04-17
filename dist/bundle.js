@@ -74018,7 +74018,7 @@ async function getCode(config) {
     console.log('Mk dir build');
     fs.mkdirSync('build');
     // await io.mkdirP("build");
-    console.log(`Files in the current folder (${process.cwd}): `, fs.readdirSync('.'));
+    console.log(`Files in the current folder (${process.cwd()}): `, fs.readdirSync('.'));
     const workdir = "build";
     // process.chdir(path.join(process.cwd) "build");
     //process.chdir(`Now in the folder ${process.cwd()}`);
