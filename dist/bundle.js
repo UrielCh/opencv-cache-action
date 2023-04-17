@@ -64727,7 +64727,7 @@ async function downloadFile(url, dest) {
     });
     console.timeEnd(key);
     const stat = fs.statSync(dest);
-    console.log(`file Size: ${stat.size / 1024} Kbytes`);
+    console.log(`file Size: ${(stat.size / 1024).toFixed(1)} Kbytes`);
     return dest;
 }
 exports.downloadFile = downloadFile;
@@ -73999,6 +73999,8 @@ const io = __webpack_require__(484);
 const process = __webpack_require__(7282);
 const Configurations_1 = __webpack_require__(1651);
 const utils_1 = __webpack_require__(8593);
+const exec = __webpack_require__(27);
+const cachePaths = ["opencv", "opencv_contrib", "build"];
 async function getCode(config) {
     await (0, utils_1.downloadFile)(config.openCVUrl, "opencv.zip");
     await (0, utils_1.unzipFile)("opencv.zip", "opencv");
@@ -74019,14 +74021,14 @@ async function getCode(config) {
     if (!config.NO_CONTRIB) {
         cMakeArgs.push("-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules");
     }
-    // cMakeArgs.push("../opencv");
-    // await exec.exec("cmake", cMakeArgs);
-    // await exec.exec("cmake", ["--build", "."]);
-    // process.chdir("..");
+    cMakeArgs.push("../opencv");
+    await exec.exec("cmake", cMakeArgs);
+    await exec.exec("cmake", ["--build", "."]);
+    process.chdir("..");
     // console.log("start saveCache to key:", storeKey);
-    // const ret = await cache.saveCache(cachePaths, storeKey); // Cache Size: ~363 MB (380934981 B)
-    // console.log("saveCache return ", ret);
-    // console.timeEnd("cache");
+    const ret = await cache.saveCache(cachePaths, config.storeKey); // Cache Size: ~363 MB (380934981 B)
+    console.log("saveCache return ", ret);
+    console.timeEnd("cache");
 }
 // most @actions toolkit packages have async methods
 async function run() {
@@ -74036,18 +74038,17 @@ async function run() {
         const config = new Configurations_1.Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"));
         config.normalize();
         // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
-        const cachePaths = ["opencv", "opencv_contrib", "build"];
         console.log(`current PWD: ${process.cwd()}`);
         // get one LVL up
         process.chdir("..");
         console.log(`changing directory to: ${process.cwd()}`);
-        const storeKey = config.storeKey;
         if (!cache.isFeatureAvailable) {
             console.log("Cache service is not availible");
             await getCode(config);
             return;
         }
         console.time("cache");
+        const storeKey = config.storeKey;
         console.log(`Get Cache key: ${storeKey}`);
         const cacheKey = await cache.restoreCache(cachePaths, storeKey, undefined, {
             downloadConcurrency: 4,

@@ -4,7 +4,9 @@ import * as io from "@actions/io";
 import * as process from "process";
 import { Configurations } from "./Configurations";
 import { downloadFile, unzipFile } from "./utils";
+import * as exec from "@actions/exec";
 
+const cachePaths = ["opencv", "opencv_contrib", "build"];
 
 async function getCode(config: Configurations) {
   await downloadFile(config.openCVUrl, "opencv.zip");
@@ -28,15 +30,14 @@ async function getCode(config: Configurations) {
   if (!config.NO_CONTRIB) {
     cMakeArgs.push("-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules");
   }
-
-  // cMakeArgs.push("../opencv");
-  // await exec.exec("cmake", cMakeArgs);
-  // await exec.exec("cmake", ["--build", "."]);
-  // process.chdir("..");
+  cMakeArgs.push("../opencv");
+  await exec.exec("cmake", cMakeArgs);
+  await exec.exec("cmake", ["--build", "."]);
+  process.chdir("..");
   // console.log("start saveCache to key:", storeKey);
-  // const ret = await cache.saveCache(cachePaths, storeKey); // Cache Size: ~363 MB (380934981 B)
-  // console.log("saveCache return ", ret);
-  // console.timeEnd("cache");
+  const ret = await cache.saveCache(cachePaths, config.storeKey); // Cache Size: ~363 MB (380934981 B)
+  console.log("saveCache return ", ret);
+  console.timeEnd("cache");
 }
 
 // most @actions toolkit packages have async methods
@@ -47,18 +48,17 @@ async function run() {
     const config = new Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"));
     config.normalize();
     // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
-    const cachePaths = ["opencv", "opencv_contrib", "build"];
     console.log(`current PWD: ${process.cwd()}`);
     // get one LVL up
     process.chdir("..");
     console.log(`changing directory to: ${process.cwd()}`);
-    const storeKey = config.storeKey;
     if (!cache.isFeatureAvailable) {
       console.log("Cache service is not availible");
       await getCode(config);
       return;
     }
     console.time("cache");
+    const storeKey = config.storeKey;
     console.log(`Get Cache key: ${storeKey}`);
     const cacheKey = await cache.restoreCache(cachePaths, storeKey, undefined, {
       downloadConcurrency: 4,

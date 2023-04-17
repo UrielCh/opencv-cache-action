@@ -34,7 +34,7 @@ export async function downloadFile(url: string, dest: string) {
     })
     console.timeEnd(key);
     const stat = fs.statSync(dest);
-    console.log(`file Size: ${stat.size/1024} Kbytes`)
+    console.log(`file Size: ${(stat.size/1024).toFixed(1)} Kbytes`)
     return dest;
 }
 
