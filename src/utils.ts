@@ -1,25 +1,27 @@
 import * as httpm from "@actions/http-client";
 import * as fs from "fs";
 import * as zlib from 'zlib';
+import * as unzipper from 'unzipper';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 
 const pipelineAsync = promisify(pipeline);
 
-export async function unzipFile(input: string, output: string) {
-    const key = `Unzip ${input}`;
-    const readStream = fs.createReadStream(input);
-    const writeStream = fs.createWriteStream(output);
-    const unzip = zlib.createUnzip();
-    console.time(key);
-    try {
-        await pipelineAsync(readStream, unzip, writeStream);
-        console.log('File unzipped successfully');
-    } catch (error) {
-        console.error('Failed to unzip the file:', error);
-    }
-    console.timeEnd(key);
-}
+async function unzipFile(input: string, dest: string) {
+    return new Promise<undefined>((resolve, reject) => {
+      // Create a read stream for the input file
+      const readStream = fs.createReadStream(input);
+  
+      // Pipe the read stream to the unzipper.Extract stream, which will extract the contents to the destination folder
+      readStream
+        .pipe(unzipper.Extract({ path: dest }))
+        .on('close', () => resolve(undefined))
+        .on('error', (err) => reject(err));
+  
+      // Handle read stream error
+      readStream.on('error', (err) => reject(err));
+    });
+  }
 
 export async function downloadFile(url: string, dest: string) {
     const key = `Downloading ${url}`;
@@ -33,6 +35,8 @@ export async function downloadFile(url: string, dest: string) {
         })
     })
     console.timeEnd(key);
+    const stat = fs.statSync(dest);
+    console.log(`file Size: ${stat.size/1024} Kbytes`)
     return dest;
 }
 
