@@ -1,7 +1,7 @@
-import core from "@actions/core";
-import cache from "@actions/cache";
-import io from "@actions/io";
-import process from "process";
+import * as core from "@actions/core";
+import * as cache from "@actions/cache";
+import * as io from "@actions/io";
+import * as process from "process";
 import { Configurations } from "./Configurations";
 import { downloadFile, unzipFile } from "./utils";
 

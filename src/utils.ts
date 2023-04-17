@@ -1,6 +1,6 @@
-import httpm from "@actions/http-client";
-import fs from "fs";
-import zlib from 'zlib';
+import * as httpm from "@actions/http-client";
+import * as fs from "fs";
+import * as zlib from 'zlib';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 
