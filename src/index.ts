@@ -80,5 +80,5 @@ async function run() {
     }
   }
 }
-console.log("Start Plugin");
+console.log("Start Plugin core:", core);
 run();

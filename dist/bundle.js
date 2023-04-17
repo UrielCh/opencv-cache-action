@@ -47249,17 +47249,17 @@ module.exports.PROCESSING_OPTIONS = PROCESSING_OPTIONS;
 /***/ }),
 
 /***/ 1651:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Configurations = void 0;
-const crypto_1 = __importDefault(__webpack_require__(6113));
+const crypto = __webpack_require__(6113);
 class Configurations {
+    branch;
+    BUILD_LIST;
+    NO_CONTRIB;
     constructor(branch, BUILD_LIST, NO_CONTRIB) {
         this.branch = branch;
         this.BUILD_LIST = BUILD_LIST;
@@ -47273,7 +47273,7 @@ class Configurations {
             .join(",");
     }
     get sig() {
-        const hash = crypto_1.default.createHash("md5");
+        const hash = crypto.createHash("md5");
         hash.update(this.BUILD_LIST);
         return hash.digest("hex");
     }
@@ -47293,167 +47293,48 @@ exports.Configurations = Configurations;
 
 /***/ }),
 
-/***/ 3607:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __importDefault(__webpack_require__(2225));
-const cache_1 = __importDefault(__webpack_require__(1188));
-const io_1 = __importDefault(__webpack_require__(484));
-const process_1 = __importDefault(__webpack_require__(7282));
-const Configurations_1 = __webpack_require__(1651);
-const utils_1 = __webpack_require__(8593);
-function getCode(config) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield (0, utils_1.downloadFile)(config.openCVUrl, "opencv.zip");
-        yield (0, utils_1.unzipFile)("opencv.zip", "opencv");
-        // await exec.exec("git", [ "clone", "--quiet", "--branch", branch, "--single-branch", "--depth", "1", "https://github.com/opencv/opencv.git", "opencv" ]);
-        if (!config.NO_CONTRIB) {
-            yield (0, utils_1.downloadFile)(config.openCVContribUrl, "opencv_contrib.zip");
-            yield (0, utils_1.unzipFile)("opencv_contrib.zip", "opencv_contrib");
-            // await exec.exec("git", [ "clone", "--branch", branch, "--single-branch", "--depth", "1", "https://github.com/opencv/opencv_contrib.git", "opencv_contrib" ]);
-        }
-        yield io_1.default.mkdirP("build");
-        process_1.default.chdir("build");
-        // see doc: https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
-        const cMakeArgs = [
-            "-DCMAKE_BUILD_TYPE=Release",
-            "-DOPENCV_ENABLE_NONFREE=ON",
-            `-DBUILD_LIST=${config.BUILD_LIST}`,
-        ];
-        if (!config.NO_CONTRIB) {
-            cMakeArgs.push("-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules");
-        }
-        // cMakeArgs.push("../opencv");
-        // await exec.exec("cmake", cMakeArgs);
-        // await exec.exec("cmake", ["--build", "."]);
-        // process.chdir("..");
-        // console.log("start saveCache to key:", storeKey);
-        // const ret = await cache.saveCache(cachePaths, storeKey); // Cache Size: ~363 MB (380934981 B)
-        // console.log("saveCache return ", ret);
-        // console.timeEnd("cache");
-    });
-}
-// most @actions toolkit packages have async methods
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            if (!core_1.default)
-                throw new Error("core is undefined");
-            const config = new Configurations_1.Configurations(core_1.default.getInput("branch"), core_1.default.getInput("BUILD_LIST"), core_1.default.getInput("NO_CONTRIB"));
-            config.normalize();
-            // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
-            const cachePaths = ["opencv", "opencv_contrib", "build"];
-            console.log(`current PWD: ${process_1.default.cwd()}`);
-            // get one LVL up
-            process_1.default.chdir("..");
-            console.log(`changing directory to: ${process_1.default.cwd()}`);
-            const storeKey = config.storeKey;
-            if (!cache_1.default.isFeatureAvailable) {
-                console.log("Cache service is not availible");
-                yield getCode(config);
-                return;
-            }
-            console.time("cache");
-            console.log(`Get Cache key: ${storeKey}`);
-            const cacheKey = yield cache_1.default.restoreCache(cachePaths, storeKey, undefined, {
-                downloadConcurrency: 4,
-                timeoutInMs: 120000,
-            });
-            if (cacheKey) {
-                console.log(`restoreCache Success`);
-                console.timeEnd("cache");
-                return;
-            }
-            console.log(`No cached value found for input keys: ${storeKey}, Building from sources`);
-            yield getCode(config);
-        }
-        catch (error) {
-            console.error(error);
-            if (error instanceof Error) {
-                core_1.default.setFailed(error.message);
-            }
-        }
-    });
-}
-console.log("Start Plugin");
-run();
-
-
-/***/ }),
-
 /***/ 8593:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.downloadFile = exports.unzipFile = void 0;
-const http_client_1 = __importDefault(__webpack_require__(4635));
-const fs_1 = __importDefault(__webpack_require__(7147));
-const zlib_1 = __importDefault(__webpack_require__(9796));
+const httpm = __webpack_require__(4635);
+const fs = __webpack_require__(7147);
+const zlib = __webpack_require__(9796);
 const stream_1 = __webpack_require__(2781);
 const util_1 = __webpack_require__(3837);
 const pipelineAsync = (0, util_1.promisify)(stream_1.pipeline);
-function unzipFile(input, output) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const key = `Unzip ${input}`;
-        const readStream = fs_1.default.createReadStream(input);
-        const writeStream = fs_1.default.createWriteStream(output);
-        const unzip = zlib_1.default.createUnzip();
-        console.time(key);
-        try {
-            yield pipelineAsync(readStream, unzip, writeStream);
-            console.log('File unzipped successfully');
-        }
-        catch (error) {
-            console.error('Failed to unzip the file:', error);
-        }
-        console.timeEnd(key);
-    });
+async function unzipFile(input, output) {
+    const key = `Unzip ${input}`;
+    const readStream = fs.createReadStream(input);
+    const writeStream = fs.createWriteStream(output);
+    const unzip = zlib.createUnzip();
+    console.time(key);
+    try {
+        await pipelineAsync(readStream, unzip, writeStream);
+        console.log('File unzipped successfully');
+    }
+    catch (error) {
+        console.error('Failed to unzip the file:', error);
+    }
+    console.timeEnd(key);
 }
 exports.unzipFile = unzipFile;
-function downloadFile(url, dest) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const key = `Downloading ${url}`;
-        console.time(key);
-        const http = new http_client_1.default.HttpClient('Github actions client');
-        const file = fs_1.default.createWriteStream(dest);
-        yield new Promise(resolve => {
-            const req = http.get(url);
-            req.then(({ message }) => {
-                message.pipe(file).on('close', () => { resolve(undefined); });
-            });
+async function downloadFile(url, dest) {
+    const key = `Downloading ${url}`;
+    console.time(key);
+    const http = new httpm.HttpClient('Github actions client');
+    const file = fs.createWriteStream(dest);
+    await new Promise(resolve => {
+        const req = http.get(url);
+        req.then(({ message }) => {
+            message.pipe(file).on('close', () => { resolve(undefined); });
         });
-        console.timeEnd(key);
-        return dest;
     });
+    console.timeEnd(key);
+    return dest;
 }
 exports.downloadFile = downloadFile;
 
@@ -55368,11 +55249,93 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	})();
 /******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__(3607);
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+var exports = __webpack_exports__;
+var __webpack_unused_export__;
+
+__webpack_unused_export__ = ({ value: true });
+const core = __webpack_require__(2225);
+const cache = __webpack_require__(1188);
+const io = __webpack_require__(484);
+const process = __webpack_require__(7282);
+const Configurations_1 = __webpack_require__(1651);
+const utils_1 = __webpack_require__(8593);
+async function getCode(config) {
+    await (0, utils_1.downloadFile)(config.openCVUrl, "opencv.zip");
+    await (0, utils_1.unzipFile)("opencv.zip", "opencv");
+    // await exec.exec("git", [ "clone", "--quiet", "--branch", branch, "--single-branch", "--depth", "1", "https://github.com/opencv/opencv.git", "opencv" ]);
+    if (!config.NO_CONTRIB) {
+        await (0, utils_1.downloadFile)(config.openCVContribUrl, "opencv_contrib.zip");
+        await (0, utils_1.unzipFile)("opencv_contrib.zip", "opencv_contrib");
+        // await exec.exec("git", [ "clone", "--branch", branch, "--single-branch", "--depth", "1", "https://github.com/opencv/opencv_contrib.git", "opencv_contrib" ]);
+    }
+    await io.mkdirP("build");
+    process.chdir("build");
+    // see doc: https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
+    const cMakeArgs = [
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DOPENCV_ENABLE_NONFREE=ON",
+        `-DBUILD_LIST=${config.BUILD_LIST}`,
+    ];
+    if (!config.NO_CONTRIB) {
+        cMakeArgs.push("-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules");
+    }
+    // cMakeArgs.push("../opencv");
+    // await exec.exec("cmake", cMakeArgs);
+    // await exec.exec("cmake", ["--build", "."]);
+    // process.chdir("..");
+    // console.log("start saveCache to key:", storeKey);
+    // const ret = await cache.saveCache(cachePaths, storeKey); // Cache Size: ~363 MB (380934981 B)
+    // console.log("saveCache return ", ret);
+    // console.timeEnd("cache");
+}
+// most @actions toolkit packages have async methods
+async function run() {
+    try {
+        if (!core)
+            throw new Error("core is undefined");
+        const config = new Configurations_1.Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"));
+        config.normalize();
+        // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
+        const cachePaths = ["opencv", "opencv_contrib", "build"];
+        console.log(`current PWD: ${process.cwd()}`);
+        // get one LVL up
+        process.chdir("..");
+        console.log(`changing directory to: ${process.cwd()}`);
+        const storeKey = config.storeKey;
+        if (!cache.isFeatureAvailable) {
+            console.log("Cache service is not availible");
+            await getCode(config);
+            return;
+        }
+        console.time("cache");
+        console.log(`Get Cache key: ${storeKey}`);
+        const cacheKey = await cache.restoreCache(cachePaths, storeKey, undefined, {
+            downloadConcurrency: 4,
+            timeoutInMs: 120000,
+        });
+        if (cacheKey) {
+            console.log(`restoreCache Success`);
+            console.timeEnd("cache");
+            return;
+        }
+        console.log(`No cached value found for input keys: ${storeKey}, Building from sources`);
+        await getCode(config);
+    }
+    catch (error) {
+        console.error(error);
+        if (error instanceof Error) {
+            core.setFailed(error.message);
+        }
+    }
+}
+console.log("Start Plugin core:", core);
+run();
+
+})();
+
 /******/ })()
 ;
