@@ -1,6 +1,81 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 3342:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const crypto = __nccwpck_require__(6113);
+
+class Configurations {
+  /**
+   * @param {string} branch
+   * @param {string} BUILD_LIST
+   * @param {string} NO_CONTRIB
+   */
+  constructor(branch, BUILD_LIST, NO_CONTRIB) {
+    this.branch = branch;
+    this.BUILD_LIST = BUILD_LIST;
+    this.NO_CONTRIB = NO_CONTRIB;
+    this.normalize();
+  }
+
+  normalize() {
+    this.BUILD_LIST = this.BUILD_LIST
+      .split(",")
+      .filter((a) => a.trim())
+      .sort()
+      .join(",");
+  }
+
+  /**
+   * @returns {string} md5 hash
+   */
+  get sig() {
+    const hash = crypto.createHash("md5");
+    hash.update(this.BUILD_LIST);
+    return hash.digest("hex");
+  }
+
+  /**
+   * @returns {string} cache key
+   */
+  get storeKey() {
+    const platform = process.env.RUNNER_OS;
+    return `opencv-${platform}-${this.branch}-${this.sig}${
+      this.NO_CONTRIB ? "-no-contrib" : ""
+    }`;
+  }
+
+  /**
+   * @returns {string} opencv url
+   */
+  get openCVUrl() {
+    return `https://github.com/opencv/opencv/archive/${this.branch}.zip`;
+  }
+
+  /**
+   * @returns {string} opencv_contrib url
+   */
+  get openCVContribUrl() {
+    return `https://github.com/opencv/opencv_contrib/archive/${this.branch}.zip`;
+  }
+
+  /**
+   * @returns {string[]} cache paths
+   */
+  get cacheDir() {
+    if (this.NO_CONTRIB) {
+      return ["opencv", "build"];
+    }
+    return ["opencv", "opencv_contrib", "build"];
+  }
+}
+
+module.exports = Configurations;
+
+
+/***/ }),
+
 /***/ 7799:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -57711,22 +57786,12 @@ const cache = __nccwpck_require__(7799);
 const exec = __nccwpck_require__(1514);
 const io = __nccwpck_require__(7436);
 const process = __nccwpck_require__(7282);
-const crypto = __nccwpck_require__(6113);
-
-// const wait = require('./wait');
+const Configurations = __nccwpck_require__(3342);
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const branch = core.getInput("branch");
-    const BUILD_LIST = core.getInput("BUILD_LIST").split(",").filter((a) =>
-      a.trim()
-    ).sort().join(",");
-    const NO_CONTRIB = core.getInput("NO_CONTRIB");
-
-    const hash = crypto.createHash("md5");
-    hash.update(BUILD_LIST);
-    const sig = hash.digest("hex");
+    const config = new Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"));
     // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
     const cachePaths = ["opencv", "opencv_contrib", "build"];
     await exec.exec("pwd");
@@ -57735,10 +57800,7 @@ async function run() {
 
     let cacheKey = undefined;
 
-    const platform = process.env.RUNNER_OS;
-    const storeKey = `opencv-${platform}-${branch}-${sig}${
-      NO_CONTRIB ? "-no-contrib" : ""
-    }`;
+    const storeKey = config.storeKey;
     console.time("cache");
     if (!cache.isFeatureAvailable) {
       core.setOutput("Cache service is not availible");
@@ -57776,18 +57838,18 @@ async function run() {
       "clone",
       "--quiet",
       "--branch",
-      branch,
+      config.branch,
       "--single-branch",
       "--depth",
       "1",
       "https://github.com/opencv/opencv.git",
       "opencv",
     ]);
-    if (!NO_CONTRIB) {
+    if (!config.NO_CONTRIB) {
       await exec.exec("git", [
         "clone",
         "--branch",
-        branch,
+        config.branch,
         "--single-branch",
         "--depth",
         "1",
@@ -57801,9 +57863,9 @@ async function run() {
     const cMakeArgs = [
       "-DCMAKE_BUILD_TYPE=Release",
       "-DOPENCV_ENABLE_NONFREE=ON",
-      `-DBUILD_LIST=${BUILD_LIST}`,
+      `-DBUILD_LIST=${config.BUILD_LIST}`,
     ];
-    if (!NO_CONTRIB) {
+    if (!config.NO_CONTRIB) {
       cMakeArgs.push("-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules");
     }
 

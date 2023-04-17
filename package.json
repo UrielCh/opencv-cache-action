@@ -7,6 +7,7 @@
     "lint": "eslint .",
     "prepare": "ncc build legacy.js -o dist --source-map --license licenses.txt",
     "prepare-new": "webpack",
+    "webpack": "webpack",
     "all": "npm run lint && npm run prepare"
   },
   "repository": {

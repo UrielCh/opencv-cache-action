@@ -3,22 +3,12 @@ const cache = require("@actions/cache");
 const exec = require("@actions/exec");
 const io = require("@actions/io");
 const process = require("process");
-const crypto = require("crypto");
-
-// const wait = require('./wait');
+const Configurations = require("./Configurations");
 
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const branch = core.getInput("branch");
-    const BUILD_LIST = core.getInput("BUILD_LIST").split(",").filter((a) =>
-      a.trim()
-    ).sort().join(",");
-    const NO_CONTRIB = core.getInput("NO_CONTRIB");
-
-    const hash = crypto.createHash("md5");
-    hash.update(BUILD_LIST);
-    const sig = hash.digest("hex");
+    const config = new Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"));
     // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
     const cachePaths = ["opencv", "opencv_contrib", "build"];
     await exec.exec("pwd");
@@ -27,10 +17,7 @@ async function run() {
 
     let cacheKey = undefined;
 
-    const platform = process.env.RUNNER_OS;
-    const storeKey = `opencv-${platform}-${branch}-${sig}${
-      NO_CONTRIB ? "-no-contrib" : ""
-    }`;
+    const storeKey = config.storeKey;
     console.time("cache");
     if (!cache.isFeatureAvailable) {
       core.setOutput("Cache service is not availible");
@@ -68,18 +55,18 @@ async function run() {
       "clone",
       "--quiet",
       "--branch",
-      branch,
+      config.branch,
       "--single-branch",
       "--depth",
       "1",
       "https://github.com/opencv/opencv.git",
       "opencv",
     ]);
-    if (!NO_CONTRIB) {
+    if (!config.NO_CONTRIB) {
       await exec.exec("git", [
         "clone",
         "--branch",
-        branch,
+        config.branch,
         "--single-branch",
         "--depth",
         "1",
@@ -93,9 +80,9 @@ async function run() {
     const cMakeArgs = [
       "-DCMAKE_BUILD_TYPE=Release",
       "-DOPENCV_ENABLE_NONFREE=ON",
-      `-DBUILD_LIST=${BUILD_LIST}`,
+      `-DBUILD_LIST=${config.BUILD_LIST}`,
     ];
-    if (!NO_CONTRIB) {
+    if (!config.NO_CONTRIB) {
       cMakeArgs.push("-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules");
     }
 

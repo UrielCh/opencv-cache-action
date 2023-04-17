@@ -16,11 +16,20 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   optimization: {
-    minimize: false
+    minimize: false,
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+        },
+      },
+    },
   },
   target: 'node',
   output: {
-    filename: "index.js",
-    path: path.resolve(__dirname, "dist"),
+    filename: "[name].bundle.js",
+    path: path.resolve(__dirname, 'dist'),
   },
 };
