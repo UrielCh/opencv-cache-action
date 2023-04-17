@@ -1,0 +1,27 @@
+name: build openCV with itself
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build OpenCV from sources
+      uses: UrielCh/opencv-cache-action@main
+      with:
+        branch: "4.6.0"
+        BUILD_LIST: "core,imgproc,imgcodecs"
+        NO_CONTRIB: "1"
+
+    - name: List files of build
+      run: cd ${GITHUB_WORKSPACE}/.. && find build
+    - name: List files of opencv
+      run: cd ${GITHUB_WORKSPACE}/.. && find opencv

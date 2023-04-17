@@ -9,6 +9,9 @@ inputs:
     description: 'List of feature to compile, the less features you select the smallest will be the image.'
     required: true
     default: 'core'
+  NO_CONTRIB:
+    description: 'Disable openCV contrib.'
+    default: ''
 
 #outputs:
 #  time: # output will be available to future steps
