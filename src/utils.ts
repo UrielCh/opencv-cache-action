@@ -2,8 +2,6 @@ import * as httpm from "@actions/http-client";
 import * as fs from "fs";
 import * as zlib from 'zlib';
 import * as unzipper from 'unzipper';
-import { pipeline } from 'stream';
-import { promisify } from 'util';
 
 export async function unzipFile(input: string, dest: string) {
     return new Promise<undefined>((resolve, reject) => {

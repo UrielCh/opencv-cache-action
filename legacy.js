@@ -8,42 +8,31 @@ const Configurations = require("./Configurations");
 // most @actions toolkit packages have async methods
 async function run() {
   try {
-    const config = new Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"));
+    const config = new Configurations(
+      core.getInput("branch"),
+      core.getInput("BUILD_LIST"),
+      core.getInput("NO_CONTRIB"),
+    );
     // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
-    const cachePaths = ["opencv", "opencv_contrib", "build"];
-    await exec.exec("pwd");
-    // get one LVL up
     process.chdir("..");
-
     let cacheKey = undefined;
-
     const storeKey = config.storeKey;
     console.time("cache");
     if (!cache.isFeatureAvailable) {
       core.setOutput("Cache service is not availible");
     } else {
-      cacheKey = await cache.restoreCache(cachePaths, storeKey, undefined, {
-        lookupOnly: true,
-      });
+      cacheKey = await cache.restoreCache(
+        config.cachePaths,
+        storeKey,
+        undefined,
+        {},
+      );
       console.log(`Lookup cache key: "${storeKey}" return ${cacheKey}`);
-
       if (cacheKey) {
-        for (let i = 0; i < 10; i++) {
-          console.log(`Get Cache key: ${storeKey} pass ${i + 1}/10`);
-          cacheKey = await cache.restoreCache(cachePaths, storeKey, undefined, {
-            downloadConcurrency: 4,
-            timeoutInMs: 120000,
-          });
-          if (cacheKey) {
-            console.log(`restoreCache Success`);
-            // core.setOutput("Cache Restored");
-            console.timeEnd("cache");
-            return;
-          }
-        }
-        core.error(`restoreCache key: ${storeKey} Failed.`);
-        core.setFailed(`restoreCache key: ${storeKey} Failed.`);
-        process.exit(1);
+        console.log(`restoreCache Success`);
+        // core.setOutput("Cache Restored");
+        console.timeEnd("cache");
+        return;
       } else {
         console.log(
           `No cached value found for input keys: ${storeKey}, Building from sources`,
@@ -90,12 +79,9 @@ async function run() {
     await exec.exec("cmake", cMakeArgs);
     await exec.exec("cmake", ["--build", "."]);
     process.chdir("..");
-    // await exec.exec("ls -l"); // build opencv opencv_contrib
     console.log("start saveCache to key:", storeKey);
-    const ret = await cache.saveCache(cachePaths, storeKey); // Cache Size: ~363 MB (380934981 B)
-    // await wait(parseInt(ms));
+    const ret = await cache.saveCache(config.cachePaths, storeKey); // Cache Size: ~363 MB (380934981 B)
     console.log("saveCache return ", ret);
-    // core.setOutput('time', new Date().toTimeString());
     console.timeEnd("cache");
   } catch (error) {
     console.error(error.message);
