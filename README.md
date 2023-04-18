@@ -1,5 +1,5 @@
 # opencv-cache-action
-This GitHub Action, UrielCh/opencv-cache-action@V0, is designed to download, build, and cache OpenCV, significantly improving the speed of your GitHub Actions workflows. Building OpenCV from source usually takes about an hour, but with this action, the process is reduced to just a few seconds.
+This GitHub Action, `UrielCh/opencv-cache-action@V0`, is designed to download, build, and cache OpenCV, significantly improving the speed of your GitHub Actions workflows. Building OpenCV from source usually takes about an hour, but with this action, the process is reduced to just a few seconds.
 
 ## Usage
 To use this action in your GitHub Actions workflow, simply add the following step:
