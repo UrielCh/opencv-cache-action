@@ -91,3 +91,16 @@ jobs:
 ```
 
 By integrating this action into your GitHub Actions workflows, you can save a significant amount of time that would otherwise be spent building OpenCV from source.
+
+
+## Changelog
+
+* `V1` improved version
+  * Writen in Typescript
+  * Use webpack as bundler
+  * Get openCV source from github zip export
+
+* `V0` initial version
+  * Writen in vanilla javascript
+  * Use @vercel/ncc as bundler
+  * Clone openCV source code with git
