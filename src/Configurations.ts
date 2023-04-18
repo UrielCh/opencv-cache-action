@@ -1,10 +1,19 @@
 import * as crypto from "crypto";
 
 export class Configurations {
-    constructor( public branch: string,
-      public BUILD_LIST: string,
-      public NO_CONTRIB: string,
-    ) {}
+    public branch: string;
+    public BUILD_LIST: string;
+    public NO_CONTRIB: string;
+
+    constructor(branch: string,
+      BUILD_LIST: string,
+      NO_CONTRIB: string,
+    ) {
+        this.branch = branch || "4.6.0";
+        this.BUILD_LIST = BUILD_LIST || "core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,photo,gapi,python3,python_bindings_generator";
+        this.NO_CONTRIB = NO_CONTRIB || "";
+        this.normalize();
+    }
     normalize() {
       this.BUILD_LIST = this.BUILD_LIST
       .split(",")

@@ -17,19 +17,12 @@ async function getCode(config: Configurations) {
     // await exec.exec("git", [ "clone", "--branch", branch, "--single-branch", "--depth", "1", "https://github.com/opencv/opencv_contrib.git", "opencv_contrib" ]);
   }
 
-  console.log('Files in the current folder: ', fs.readdirSync('.'))
-
-  console.log('Mk dir build')
-  fs.mkdirSync('build');
+  fs.mkdirSync('build', { recursive: true });
   // await io.mkdirP("build");
   console.log(`Files in the current folder (${process.cwd()}): `, fs.readdirSync('.'))
-
   const workdir = "build";
-
   // process.chdir(path.join(process.cwd) "build");
-
   //process.chdir(`Now in the folder ${process.cwd()}`);
-  
   // see doc: https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
   const cMakeArgs = [
     "-DCMAKE_BUILD_TYPE=Release",
@@ -40,16 +33,19 @@ async function getCode(config: Configurations) {
     cMakeArgs.push("-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules");
   }
   cMakeArgs.push("../opencv");
+  console.log("start cmake with args:", cMakeArgs);
   await exec.exec("cmake", cMakeArgs, {cwd: workdir});
+  console.log("start cmake build");
   await exec.exec("cmake", ["--build", "."], {cwd: workdir});
   // process.chdir("..");
-
-  process.chdir(`back to folder ${process.cwd()}`);
-
+  console.log(`stay in folder ${process.cwd()}`);
   // console.log("start saveCache to key:", storeKey);
-  const ret = await cache.saveCache(config.cacheDir, config.storeKey); // Cache Size: ~363 MB (380934981 B)
-  console.log("saveCache return ", ret);
-  console.timeEnd("cache");
+  if (cache.isFeatureAvailable()) {
+    console.time("upload cache");
+    const ret = await cache.saveCache(config.cacheDir, config.storeKey); // Cache Size: ~363 MB (380934981 B)
+    console.log("saveCache return ", ret);
+    console.timeEnd("upload cache");
+  }
 }
 
 // most @actions toolkit packages have async methods
@@ -58,27 +54,26 @@ async function run() {
     if (!core)
       throw new Error("core is undefined");
     const config = new Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"));
-    config.normalize();
     // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
     console.log(`current PWD: ${process.cwd()}`);
     // get one LVL up
     process.chdir("..");
     console.log(`changing directory to: ${process.cwd()}`);
-    if (!cache.isFeatureAvailable) {
+    if (!cache.isFeatureAvailable()) {
       console.log("Cache service is not availible");
       await getCode(config);
       return;
     }
-    console.time("cache");
     const storeKey = config.storeKey;
     console.log(`Get Cache key: ${storeKey}`);
+    console.time("get cache");
     const cacheKey = await cache.restoreCache(config.cacheDir, storeKey, undefined, {
       downloadConcurrency: 4,
       timeoutInMs: 120000,
     });
+    console.timeEnd("get cache");
     if (cacheKey) {
       console.log(`restoreCache Success`);
-      console.timeEnd("cache");
       return;
     }
     console.log(
