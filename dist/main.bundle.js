@@ -35,7 +35,9 @@ class Configurations {
     }
     get storeKey() {
         const platform = process.env.RUNNER_OS;
-        return `opencv-${platform}-${this.branch}-${this.sig}${this.NO_CONTRIB ? "-no-contrib" : ""}`;
+        const ct = this.NO_CONTRIB ? "-no-contrib" : "";
+        const shr = this.DO_SHRINK ? "-lt" : "";
+        return `opencv-${platform}-${this.branch}-${this.sig}${ct}${shr}`;
     }
     get openCVUrl() {
         return `https://github.com/opencv/opencv/archive/${this.branch}.zip`;
