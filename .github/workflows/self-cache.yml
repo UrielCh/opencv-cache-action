@@ -2,9 +2,9 @@ name: build openCV with itself
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "V0", "V1" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "V0", "V1" ]
 
 jobs:
   build:
