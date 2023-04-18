@@ -39,7 +39,7 @@ async function run() {
         );
       }
     }
-
+    console.log("start cloning opencv.git")
     await exec.exec("git", [
       "clone",
       "--quiet",
@@ -51,7 +51,9 @@ async function run() {
       "https://github.com/opencv/opencv.git",
       "opencv",
     ]);
+    
     if (!config.NO_CONTRIB) {
+      console.log("start cloning opencv_contrib.git")
       await exec.exec("git", [
         "clone",
         "--branch",
@@ -63,9 +65,11 @@ async function run() {
         "opencv_contrib",
       ]);
     }
+    console.log("create build dir")
     await io.mkdirP("build");
     process.chdir("build");
     // see doc: https://docs.opencv.org/4.x/db/d05/tutorial_config_reference.html
+    console.log(`working in ${process.cwd}`);
     const cMakeArgs = [
       "-DCMAKE_BUILD_TYPE=Release",
       "-DOPENCV_ENABLE_NONFREE=ON",
@@ -74,10 +78,14 @@ async function run() {
     if (!config.NO_CONTRIB) {
       cMakeArgs.push("-DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules");
     }
-
     cMakeArgs.push("../opencv");
-    await exec.exec("cmake", cMakeArgs);
-    await exec.exec("cmake", ["--build", "."]);
+
+    console.log(`exec: cmake`, cMakeArgs);
+    let code = await exec.exec("cmake", cMakeArgs);
+    console.log(`cmake return code:`, code);
+    console.log(`exec: cmake --build .`);
+    code = await exec.exec("cmake", ["--build", "."]);
+    console.log(`cmake build return code:`, code);
     process.chdir("..");
     console.log("start saveCache to key:", storeKey);
     const ret = await cache.saveCache(config.cacheDir, storeKey); // Cache Size: ~363 MB (380934981 B)
@@ -88,5 +96,5 @@ async function run() {
     core.setFailed(error.message);
   }
 }
-console.log("Start Plugin");
+
 run();
