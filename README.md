@@ -84,7 +84,7 @@ jobs:
       uses: UrielCh/opencv-cache-action@V0
       with:
         branch: 4.x
-        BUILD_LIST: core
+        BUILD_LIST: core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,photo,gapi,python3
         NO_CONTRIB: ''
 
     # Your additional steps using the cached OpenCV build...
