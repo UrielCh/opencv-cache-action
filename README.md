@@ -94,17 +94,16 @@ jobs:
     # Your additional steps using the cached OpenCV build...
 ```
 
-By integrating this action into your GitHub Actions workflows, you can save a significant amount of time that would otherwise be spent building OpenCV from source.
-
+By integrating this action into your GitHub Actions workflows, you can save significant time that would otherwise be spent building OpenCV from source.
 
 ## Changelog
 
 * `V1` improved version
-  * Writen in Typescript
-  * Use webpack as bundler
-  * Get openCV source from github zip export
+  * Written in Typescript
+  * Use Webpack as bundler
+  * Get openCV source from GitHub zip export
 
 * `V0` initial version
-  * Writen in vanilla javascript
+  * Written in vanilla Javascript
   * Use @vercel/ncc as bundler
   * Clone openCV source code with git
