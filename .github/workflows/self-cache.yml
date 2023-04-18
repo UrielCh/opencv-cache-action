@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build OpenCV from sources
-      uses: UrielCh/opencv-cache-action@v1
+      uses: UrielCh/opencv-cache-action@V1
       with:
         branch: "4.6.0"
         BUILD_LIST: "core,imgproc,imgcodecs"
