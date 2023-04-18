@@ -1,5 +1,6 @@
 name: 'opencv-cache'
-description: 'download, build and cache opencv'
+description: 'download, build and cache opencv from source'
+author: 'Uriel Chemouni'
 inputs:
   branch:
     description: 'branch to checkout default is 4.x'
@@ -19,6 +20,9 @@ inputs:
 #outputs:
 #  time: # output will be available to future steps
 #    description: 'The current time after waiting'
+branding:
+  icon: 'hard-drive'
+  color: 'blue'
 runs:
   using: 'node16'
   main: 'dist/main.bundle.js'
