@@ -9,6 +9,9 @@ inputs:
     description: 'List of feature to compile, the less features you select the smallest will be the image.'
     required: true
     default: 'core'
+  DO_SHRINK:
+    description: 'redude the size of the image by removing samples and tests.'
+    default: ''
   NO_CONTRIB:
     description: 'Disable openCV contrib.'
     default: ''
@@ -18,4 +21,4 @@ inputs:
 #    description: 'The current time after waiting'
 runs:
   using: 'node16'
-  main: 'dist/index.js'
+  main: 'dist/main.bundle.js'

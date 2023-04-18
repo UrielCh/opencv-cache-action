@@ -2,29 +2,33 @@ name: build openCV with itself
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "V0", "V1" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "V0", "V1" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     # runs-on: ubuntu-22.04
-    # runs-on: windows-2022
+    # runs-on: windows-latest
 
     strategy:
       matrix:
         node-version: [16.x]
     steps:
-    - uses: actions/checkout@v3
+    # do not need to checkout the repo
+    # - uses: actions/checkout@v3
     - name: Build OpenCV from sources
-      uses: UrielCh/opencv-cache-action@main
+      uses: UrielCh/opencv-cache-action@V1
       with:
         branch: "4.6.0"
         BUILD_LIST: "core,imgproc,imgcodecs"
         NO_CONTRIB: ""
+        DO_SHRINK: "1"
 
-    - name: List files of build
-      run: cd ${GITHUB_WORKSPACE}/.. && find build
-    - name: List files of opencv
-      run: cd ${GITHUB_WORKSPACE}/.. && find opencv
+    # - name: List files of build
+    #   run: cd ${GITHUB_WORKSPACE}/.. && find build
+    # - name: List files of opencv
+    #   run: cd ${GITHUB_WORKSPACE}/.. && find opencv
+    # - name: List files of opencv_contrib
+    #   run: cd ${GITHUB_WORKSPACE}/.. && find opencv_contrib

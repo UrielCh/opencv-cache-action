@@ -1,5 +1,5 @@
 # opencv-cache-action
-This GitHub Action, `UrielCh/opencv-cache-action@V0`, is designed to download, build, and cache OpenCV, significantly improving the speed of your GitHub Actions workflows. Building OpenCV from source usually takes about an hour, but with this action, the process is reduced to just a few seconds.
+This GitHub Action, `UrielCh/opencv-cache-action@V1`, is designed to download, build, and cache OpenCV, significantly improving the speed of your GitHub Actions workflows. Building OpenCV from source usually takes about an hour, but with this action, the process is reduced to just a few seconds.
 
 ## Usage
 To use this action in your GitHub Actions workflow, simply add the following step:
@@ -8,7 +8,7 @@ To use this action in your GitHub Actions workflow, simply add the following ste
 
 steps:
   - name: Cache OpenCV
-    uses: UrielCh/opencv-cache-action@V0
+    uses: UrielCh/opencv-cache-action@V1
     with:
       branch: 4.x
       BUILD_LIST: core
@@ -32,6 +32,10 @@ The action has several input parameters to customize the OpenCV build process:
 
 #### `NO_CONTRIB`
 * Description: Disable OpenCV contrib.
+* Default: `""`
+
+#### `DO_SHRINK`
+* Description: shrink data to cache by removing samples and test; the cached data will be reduce by 90MB.
 * Default: `""`
 
 
@@ -81,7 +85,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Cache OpenCV
-      uses: UrielCh/opencv-cache-action@V0
+      uses: UrielCh/opencv-cache-action@V1
       with:
         branch: 4.x
         BUILD_LIST: core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,photo,gapi,python3
@@ -91,3 +95,16 @@ jobs:
 ```
 
 By integrating this action into your GitHub Actions workflows, you can save a significant amount of time that would otherwise be spent building OpenCV from source.
+
+
+## Changelog
+
+* `V1` improved version
+  * Writen in Typescript
+  * Use webpack as bundler
+  * Get openCV source from github zip export
+
+* `V0` initial version
+  * Writen in vanilla javascript
+  * Use @vercel/ncc as bundler
+  * Clone openCV source code with git
