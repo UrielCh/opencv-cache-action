@@ -22,7 +22,7 @@ async function run() {
       core.setOutput("Cache service is not availible");
     } else {
       cacheKey = await cache.restoreCache(
-        config.cachePaths,
+        config.cacheDir,
         storeKey,
         undefined,
         {},
@@ -80,7 +80,7 @@ async function run() {
     await exec.exec("cmake", ["--build", "."]);
     process.chdir("..");
     console.log("start saveCache to key:", storeKey);
-    const ret = await cache.saveCache(config.cachePaths, storeKey); // Cache Size: ~363 MB (380934981 B)
+    const ret = await cache.saveCache(config.cacheDir, storeKey); // Cache Size: ~363 MB (380934981 B)
     console.log("saveCache return ", ret);
     console.timeEnd("cache");
   } catch (error) {
