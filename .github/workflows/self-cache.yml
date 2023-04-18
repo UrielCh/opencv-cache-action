@@ -8,9 +8,9 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
     # runs-on: ubuntu-22.04
-    # runs-on: windows-latest
+    runs-on: windows-latest
 
     strategy:
       matrix:
@@ -26,9 +26,9 @@ jobs:
         NO_CONTRIB: ""
         DO_SHRINK: "1"
 
-    - name: List files of build
-      run: cd ${GITHUB_WORKSPACE}/.. && find build
-    - name: List files of opencv
-      run: cd ${GITHUB_WORKSPACE}/.. && find opencv
-    - name: List files of opencv_contrib
-      run: cd ${GITHUB_WORKSPACE}/.. && find opencv_contrib
+    # - name: List files of build
+    #   run: cd ${GITHUB_WORKSPACE}/.. && find build
+    # - name: List files of opencv
+    #   run: cd ${GITHUB_WORKSPACE}/.. && find opencv
+    # - name: List files of opencv_contrib
+    #   run: cd ${GITHUB_WORKSPACE}/.. && find opencv_contrib
