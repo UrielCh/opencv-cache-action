@@ -20,20 +20,19 @@ The action has several input parameters to customize the OpenCV build process:
 
 ### Inputs
 
-> branch
+#### `branch`
 * Description: Branch to checkout (default is `"4.x"`).
 * Required: true
 * Default: `"4.x"`
 
-> BUILD_LIST
+#### `BUILD_LIST`
 * Description: List of features to compile. The fewer features you select, the smaller the image will be.
 * Required: true
 * Default: `"core"`
 
-> NO_CONTRIB
+#### `NO_CONTRIB`
 * Description: Disable OpenCV contrib.
 * Default: `""`
-
 
 
 ## Output Directories
