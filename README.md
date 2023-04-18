@@ -34,6 +34,10 @@ The action has several input parameters to customize the OpenCV build process:
 * Description: Disable OpenCV contrib.
 * Default: `""`
 
+#### `DO_SHRINK`
+* Description: shrink data to cache by removing samples and test; the cached data will be reduce by 90MB.
+* Default: `""`
+
 
 ## Output Directories
 The opencv-cache-action creates three directories one level above your checked-out code:
