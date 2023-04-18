@@ -13,10 +13,12 @@ class Configurations {
     branch;
     BUILD_LIST;
     NO_CONTRIB;
-    constructor(branch, BUILD_LIST, NO_CONTRIB) {
+    DO_SHRINK;
+    constructor(branch, BUILD_LIST, NO_CONTRIB, DO_SHRINK) {
         this.branch = branch || "4.6.0";
         this.BUILD_LIST = BUILD_LIST || "core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,photo,gapi,python3,python_bindings_generator";
         this.NO_CONTRIB = NO_CONTRIB || "";
+        this.DO_SHRINK = DO_SHRINK || "";
         this.normalize();
     }
     normalize() {
@@ -65,6 +67,8 @@ const process = __webpack_require__(7282);
 const Configurations_1 = __webpack_require__(1651);
 const utils_1 = __webpack_require__(8593);
 const exec = __webpack_require__(27);
+const glob = __webpack_require__(9535);
+const io = __webpack_require__(484);
 async function getCode(config) {
     await (0, utils_1.downloadFile)(config.openCVUrl, "opencv.zip");
     await (0, utils_1.unzipFile)("opencv.zip", "opencv");
@@ -96,6 +100,23 @@ async function getCode(config) {
     await exec.exec("cmake", ["--build", "."], { cwd: workdir });
     // process.chdir("..");
     console.log(`stay in folder ${process.cwd()}`);
+    if (config.DO_SHRINK) {
+        const patterns = [
+            'opencv/samples',
+            'opencv/doc',
+            "opencv/modules/*/test",
+            "opencv_contrib/samples",
+            "opencv_contrib/doc",
+            "opencv_contrib/modules/*/test",
+            "opencv_contrib/modules/*/samples",
+            "opencv_contrib/modules/*/tutorials",
+        ];
+        const globber = await glob.create(patterns.join('\n'));
+        const files = await globber.glob();
+        for (const file of files) {
+            await io.rmRF(file);
+        }
+    }
     // console.log("start saveCache to key:", storeKey);
     if (cache.isFeatureAvailable()) {
         console.time("upload cache");
@@ -109,7 +130,7 @@ async function run() {
     try {
         if (!core)
             throw new Error("core is undefined");
-        const config = new Configurations_1.Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"));
+        const config = new Configurations_1.Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"), core.getInput("DO_SHRINK"));
         // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
         console.log(`current PWD: ${process.cwd()}`);
         // get one LVL up

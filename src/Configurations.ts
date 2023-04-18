@@ -4,14 +4,17 @@ export class Configurations {
     public branch: string;
     public BUILD_LIST: string;
     public NO_CONTRIB: string;
+    public DO_SHRINK: string;
 
     constructor(branch: string,
       BUILD_LIST: string,
       NO_CONTRIB: string,
+      DO_SHRINK: string,
     ) {
         this.branch = branch || "4.6.0";
         this.BUILD_LIST = BUILD_LIST || "core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,photo,gapi,python3,python_bindings_generator";
         this.NO_CONTRIB = NO_CONTRIB || "";
+        this.DO_SHRINK = DO_SHRINK || "";
         this.normalize();
     }
     normalize() {

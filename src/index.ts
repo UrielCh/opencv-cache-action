@@ -5,6 +5,8 @@ import * as process from "process";
 import { Configurations } from "./Configurations";
 import { downloadFile, unzipFile } from "./utils";
 import * as exec from "@actions/exec";
+import * as glob from "@actions/glob";
+import * as io from "@actions/io";
 
 async function getCode(config: Configurations) {
   await downloadFile(config.openCVUrl, "opencv.zip");
@@ -39,6 +41,25 @@ async function getCode(config: Configurations) {
   await exec.exec("cmake", ["--build", "."], {cwd: workdir});
   // process.chdir("..");
   console.log(`stay in folder ${process.cwd()}`);
+
+  if (config.DO_SHRINK) {
+    const patterns = [
+      'opencv/samples',
+      'opencv/doc',
+      "opencv/modules/*/test",
+      "opencv_contrib/samples",
+      "opencv_contrib/doc",
+      "opencv_contrib/modules/*/test",
+      "opencv_contrib/modules/*/samples",
+      "opencv_contrib/modules/*/tutorials",
+    ];
+    const globber = await glob.create(patterns.join('\n'))
+    const files = await globber.glob()
+    for (const file of files) {
+      await io.rmRF(file);
+    }
+  }
+
   // console.log("start saveCache to key:", storeKey);
   if (cache.isFeatureAvailable()) {
     console.time("upload cache");
@@ -53,7 +74,7 @@ async function run() {
   try {
     if (!core)
       throw new Error("core is undefined");
-    const config = new Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"));
+    const config = new Configurations(core.getInput("branch"), core.getInput("BUILD_LIST"), core.getInput("NO_CONTRIB"), core.getInput("DO_SHRINK"));
     // core,imgproc,imgcodecs,videoio,highgui,video,calib3d,features2d,objdetect,dnn,ml,flann,photo,stitching,gapi,python3,ts,python_bindings_generator
     console.log(`current PWD: ${process.cwd()}`);
     // get one LVL up
